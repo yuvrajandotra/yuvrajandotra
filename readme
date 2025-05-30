@@ -749,6 +749,226 @@ java -jar build/libs/MyMavenToGradle-1.0-SNAPSHOT.jar
 Hello World
 
 
+PIPELINE
+//MAVEN
+
+
+
+
+
+pipeline {
+    agent any  // Use any available agent
+
+    tools {
+        maven 'Maven'  // Ensure this matches the name configured in Jenkins
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Hemavathipcse/MyMavenJenkinsPipeline.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'  // Run Maven build
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'  // Run unit tests
+            }
+        }
+
+        
+        
+       
+        stage('Run Application') {
+            steps {
+                // Start the JAR application
+                sh 'java -jar target/MyMavenJenkinsPipeline-1.0-SNAPSHOT.jar'
+            }
+        }
+
+        
+    }
+
+    post {
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//GRADLE
+
+
+
+
+
+pipeline {
+    agent any  // Use any available agent
+
+    tools {
+        gradle 'Gradle'  // Ensure this matches the name configured in Jenkins
+        jdk 'JDK'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Hemavathipcse/GradleJenkinsPipeline.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'gradle build'  // Run Maven build
+            }
+        }
+
+       stage('Test') {
+           steps {
+               sh 'gradle test'  // Run unit tests
+           }
+        }
+
+              
+        stage('Run Application') {
+            steps {
+                // Start the JAR application
+                sh 'gradle run'
+            }
+        }
+
+        
+    }
+
+    post {
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//SELENIUM
+
+
+
+
+
+pipeline {
+	agent any
+	
+	tools {
+		maven 'MAVEN'
+		jdk 'JDK'
+	}
+	
+	stages {
+	
+		stage('Checkout') {
+			steps {
+				git branch: 'master', url: 'https://github.com/vsshubh/SeleniumApp.git'
+			}
+		}
+		
+		stage('Build') {
+			steps {
+				sh 'mvn compile package'
+			}
+		}
+		
+		stage('Test') {
+			steps {
+				sh 'mvn test'
+			}
+		}	
+		
+		stage('Archive Artifacts') {
+			steps {
+				archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+			}
+		}	
+	}
+	
+	post {
+		success {
+			echo 'Pipeline Successfull!'
+		}
+		failure {
+			echo 'Pipeline Failed!'
+		}
+	}
+}								
+
+
+
+
+
+
+
+
+
+
+
+//MAVEN WEBAPP
+
+
+
+
+pipeline {
+    agent any
+
+    tools {
+        maven 'MAVEN'
+        jdk 'JDK'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/vsshubh/MavenWebPrac.git'
+            }
+        }
+
+        stage('Build WAR') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+
+
 
 
 
