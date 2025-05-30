@@ -1,0 +1,756 @@
+1.
+/***********creating a maven based application using terminal
+
+1. open terminal and type
+mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenApp -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
+
+2. get into the directory
+ cd MyMavenApp
+ /MyMAvenApp/gedit pom.xml
+// add dependencies from maven central repository
+goto chrome --> maven central repository --> search for a particular dependency --> type junit--> it shows the dependency --> scroll up --> click on the recent version and copy the dependency available and paste it in pom.xml under dependencies tag 
+
+// add  plugins to generate jar file and to compile and intimate where to start the application from 
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>MyMavenApp</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  
+  
+  <name>MyMavenApp</name>
+  <url>http://maven.apache.org</url>
+  
+  <!-- Properties: Customize Java version or plugin versions -->
+<properties>
+<maven.compiler.source>11</maven.compiler.source>
+<maven.compiler.target>11</maven.compiler.target>
+</properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <!-- Build: Configuring plugins and build settings -->
+<build>
+<plugins>
+<!-- Example: Maven Compiler Plugin to compile Java code -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.8.1</version>
+<configuration>
+<source>1.7</source>
+<target>1.7</target>
+</configuration>
+</plugin>
+
+<!-- Example: Maven Surefire Plugin to run tests -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>2.22.2</version>
+</plugin>
+
+
+<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+                <archive>
+                    <manifestEntries>
+                        <Main-Class>com.example.App</Main-Class>
+                    </manifestEntries>
+                </archive>
+            </configuration>
+        </plugin>
+        
+</plugins>
+</build>
+</project>
+
+3. mvn compile  // compiles the application
+4. mvn test
+5. mvn package   // generates the jar file
+6. java -jar target/MyMaven.....    // run the App.java file and displays the output
+
+OR
+
+mvn clean install
+java -jar target/MyMaven.....jar 
+
+2.
+/* Maven Project To Connect To Web Servers Using Selenium Dependency
+
+ /******show the sample web page 
+https://www.saucedemo.com/
+
+with its user name and password
+
+/***********create a maven project on terminal
+mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenSeleniumApp01 -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
+
+/********Before we connect to web servers we need to have chrome driver installed
+/*********************to download chrome driver***********************************
+
+/*** you check check the chrome version 
+$google-chrome --version
+Google Chrome 133.0.6943.141 
+
+CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d'.' -f1-3)  // extracts the version and stores it in a variable CHROME_VERSION
+
+sudo apt install jq   //  extracts and transorms JSON data
+
+LATEST_DRIVER=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/latest-patch-versions-per-build.json" | jq -r ".builds[\"$CHROME_VERSION\"].version")
+
+//note: if it gives error saying curl is not found, do install curl using the command 
+sudo apt install curl
+
+wget https://storage.googleapis.com/chrome-for-testing-public/$LATEST_DRIVER/linux64/chromedriver-linux64.zip
+
+/**********Extract and move it to /usr/local/bin/:
+
+unzip chromedriver-linux64.zip
+sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+sudo chmod +x /usr/local/bin/chromedriver
+
+
+Check if ChromeDriver is installed correctly:
+
+chromedriver --version  
+ 133.0.6943.141 //same as google chrome version
+ 
+ 
+ /***********edit the pom.xml file ***********************/
+ //******Add the selenium dependency 
+ //go to maven central repository, search selenium and select selenium java and click on latest version and copy the dependency and paste it in pom.xml
+ 
+ 
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>MyMavenSeleniumApp01</artifactId>
+  <packaging>jar</packagi<ng>
+  <version>1.0-SNAPSHOT</version>
+  <name>MyMavenSeleniumApp01</name>
+  <url>http://maven.apache.org</url>
+  
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    
+    <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.29.0</version>
+</dependency>  
+  </dependencies>
+  
+  
+  
+  <!-- Build: Configuring plugins and build settings -->
+<build>
+<plugins>
+<!-- Example: Maven Compiler Plugin to compile Java code -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.8.1</version>
+<configuration>
+<source>1.7</source>
+<target>1.7</target>
+</configuration>
+</plugin>
+<!-- Example: Maven Surefire Plugin to run tests -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>2.22.2</version>
+</plugin>
+<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.1</version>      
+           <configuration>
+                <archive>
+                    <manifestEntries>
+                        <Main-Class>com.example.App</Main-Class>
+                    </manifestEntries>
+                </archive>
+            </configuration> 
+            
+            
+        </plugin>
+        
+        
+</plugins>
+</build>  
+</project>
+ 
+ /*************Before writing the App.java show them how to inspect on sauce.demo webpage to get user name and password and login -button ids 
+ // right click on web page and go to inspect, we can see the html file and click the cursor on the arrow mark available at the left end and place the cursor on username tab it shows the id used by as user-name, same on password: password, login button:login-button do make a note of these to write it in App.java file
+  
+/*****************App.java for selenium project
+
+package com.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        WebDriver driver=new ChromeDriver();
+        driver.get("https://www.saucedemo.com/");
+        driver.manage().window().maximize();
+        driver.findElement(By.id("user-name")).sendKeys("standard_user");
+        driver.findElement(By.id("password")).sendKeys("secret_sauce");
+        driver.findElement(By.id("login-button")).click();
+    }
+}
+
+/***** build and run the maven application
+mvn clean install
+
+java -jar target/MyMavenSeleniumApp01-1.0-SNAPSHOT 
+
+if we get error in executing the above jar file do run the below command 
+mvn exec:java -Dexec.mainClass="com.example.App"
+
+//********* it opens saucedemo.com and we can login using the credentials 
+
+
+
+we can run directly the java -jar target/MyMavenSeleniumApp01-1.0-SNAPSHOT  if we add the below plugin in pom.xml
+
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-shade-plugin</artifactId>
+<version>3.3.0</version>
+<executions>
+<execution>
+<phase>package</phase>
+<goals>
+<goal>shade</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
+
+3.
+/***********creating a maven based application to display list and copy content from source file to destination file using Guava dependency 
+
+1. open terminal and type
+mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenGuavaApp -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
+
+2. get into the directory
+ cd MyMavenGuavaApp
+ /MyMAvenGuavaApp/gedit pom.xml
+// add dependencies from maven central repository
+goto chrome --> maven central repository --> search for a particular dependency --> type guava--> it shows the dependency --> scroll up --> click on the recent version and copy the dependency available and also search for commons-io and paste it in pom.xml under dependencies tag 
+
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>MyMavenGuavaApp</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>MyMavenGuavaApp</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>33.4.0-jre</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.18.0</version>
+</dependency>
+
+  </dependencies>
+  
+  <!-- Build: Configuring plugins and build settings -->
+<build>
+<plugins>
+<!-- Example: Maven Compiler Plugin to compile Java code -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.8.1</version>
+<configuration>
+<source>1.7</source>
+<target>1.7</target>
+</configuration>
+</plugin>
+
+<!-- Example: Maven Surefire Plugin to run tests -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>2.22.2</version>
+</plugin>
+
+
+<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+                <archive>
+                    <manifestEntries>
+                        <Main-Class>com.example.App</Main-Class>
+                    </manifestEntries>
+                </archive>
+            </configuration>
+        </plugin>
+        
+</plugins>
+</build>
+</project>
+
+
+3. edit the App.java file which is available at /src/main/java/com/example
+
+package com.example;
+
+/**
+ * Hello world!
+ *
+ */
+ 
+ import org.apache.commons.io.FileUtils;
+import java.io.File;
+import java.io.IOException;
+import com.google.common.collect.ImmutableList;
+public class App 
+{
+    public static void main( String[] args )
+    {
+        ImmutableList<String> fruits = ImmutableList.of("Apple", "Banana", "Cherry");
+        System.out.println(fruits);
+        
+        // Define source and destination files
+        File sourceFile = new File("source.txt");
+        File destFile = new File("destination.txt");
+
+        try {
+            // Copy file using Apache Commons IO
+            FileUtils.copyFile(sourceFile, destFile);
+            System.out.println("File copied successfully!");
+        } catch (IOException e) {
+            System.err.println("Error occurred while copying file: " + e.getMessage());
+        }
+    
+    }
+}
+
+
+3. mvn clean install
+4. java -jar target/MyMaven.....jar   // if it gives error saying class not found, execute the below command
+5. mvn exec:java -Dexec.mainClass="com.example.App"
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.example:MyMavenGuavaApp >---------------------
+[INFO] Building MyMavenGuavaApp 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:3.5.0:java (default-cli) @ MyMavenGuavaApp ---
+[Apple, Banana, Cherry]
+File copied successfully!
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.198 s
+[INFO] Finished at: 2025-03-28T16:12:33+05:30
+[INFO] ------------------------------------------------------------------------
+
+// we can see the list created as [Apple, Banana, Cherry] at line number 133 and also file copied successfully
+
+6. hemavathi@hemavathi-VirtualBox:~/MyMavenGuavaApp$ cat destination.txt
+This is a file created using common io dependency
+
+
+4.
+//Create maven based web application 
+
+1. We need to install Apache tomcat to run this application	
+2.	
+3.	Sudo –i // to go to root directory
+4.	Sudo apt update && sudo upgrade –y
+5.	cd /tmp
+6.	wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.100/bin/apache-tomcat-9.0.100.tar.gz
+7.	cd ..
+8.	cd opt
+9.	mkdir tomcat
+10.	cd ..
+11.	cd tmp
+12.	tar file has to be extracted into the tomcat folder so run the below command
+13.	sudo tar -xvzf apache-tomcat-9.0.100.tar.gz -C /opt/tomcat --strip-components=1
+14.	cd ..
+15.	cd opt/tomcat
+16.	ls // we can see all files are extracted 
+17.	cd conf
+18.	ls // we can see server.xml use this file to change the port number from default 8080 to any number say 9090 because Jenkins is running on 8080
+19.	gedit server.xml // go to line number 70 and change the portnumber to 9090  <connector port=9090…..> save
+20.	we need to create tomcat users as well so add the users in tomcat-users.xml file
+21.	gedit tomcat-users.xml  
+22.	line 22 add  <user username="admin" password="Admin" roles="manager-gui"/> then save
+23.	cd ..
+24.	cd bin
+25.	ls // we can startup.sh and shutdown,sh to start the tomcat and stop the tomcat 
+26.	just try opening the page in browser say localhost:9090  it displays page cannot be displayed so we need to start the tomcat
+27.	sh startup.sh
+28.	now check in the browser, localhost:9090  tomcat web page is displayed
+29.	go to manage app on the right side of the web page it will ask for username and password. Enter the user name and password what we added in the step number 22
+30.	The server displays default files along with the user created files if any
+31.	 Go back to terminal and type cd ..
+32.	Ls // we can see webapp folder this is where we will be copying the war file generated by maven based web application
+
+
+2. once apache tomcat is installed, create a web application
+
+mvn archetype:generate -DgroupId=com.example -DartifactId=MymavenWebApp01 -DarchetypeArtifactId=maven-archetype-webapp -DinterativeMode=false
+
+
+3. Add the dependency Servlet app in pom.xml -search for 
+<!-- Servlet API for Java EE -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+4.It generates a WAR file instead of JAR file so add the plugin accordingly and we donot need plugin to start the java application plugin because it is an web appication so we write the artifactId of build plugin as <artifactId>maven-war-plugin</artifactId> 
+
+<build>
+  <plugins>
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-war-plugin</artifactId>
+    <version>3.4.0</version> <!-- Update to latest stable version -->
+</plugin>
+</plugins>
+    <finalName>MymavenWebApp01</finalName>
+  </build>
+</project>  
+
+
+//Entire pom.xml is as 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>MymavenWebApp01</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>MymavenWebApp01 Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Servlet API for Java EE -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+  </dependencies>
+  <build>
+  <plugins>
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-war-plugin</artifactId>
+    <version>3.4.0</version> <!-- Update to latest stable version -->
+</plugin>
+</plugins>
+    <finalName>MymavenWebApp01</finalName> <!-- create a web page with the name MymavenWebapp01, if we want some other name we can chage it -->
+  </build>
+</project>
+
+
+//when we use the tree we can see that webapp,index.jsp and web.xml is created instead of App.java
+── pom.xml
+├── src
+│   └── main
+│       ├── resources
+│       └── webapp
+│           ├── index.jsp
+│           └── WEB-INF
+│               └── web.xml
+
+// check the index.jsp file. It will be a simple web application by default
+<html>
+<body>
+<h2>Hello World!</h2>
+</body>
+</html>
+
+
+//mvn clean install
+
+//tree 
+we can see the war file inside the target folder
+── target
+    ├── classes
+    ├── maven-archiver
+    │   └── pom.properties
+    ├── MymavenWebApp01
+    │   ├── index.jsp
+    │   ├── META-INF
+    │   └── WEB-INF
+    │       ├── classes
+    │       └── web.xml
+    └── MymavenWebApp01.war
+
+
+// now copy this war file manually into apache tomcat webapps folder
+goto home->other locations->computer->opt/tomcat/webapps --> paste the war file here
+
+Or use the command as 
+cp target/MyMavenWebapp01.war /opt/tomcat/webapps 
+
+
+// goto browser and type
+localhost:9090  
+since jenkins is running on 8080, configure a different port number for tomcat while in starting itself because by default tomcat also runs on 8080 
+// it displays the MyMavenWebapp.war file just click on the file displays "Hello World"
+
+
+   5.
+
+/******************to build a gradle project
+
+create a directory MyGradleApp and be in that directory
+mkdir MyGradleApp
+cd MyGradleApp
+gradle init --type java-application
+/* show the build.gradle
+
+
+/*
+ * This build file was generated by the Gradle 'init' task.
+ *
+ * This generated file contains a sample Java project to get you started.
+ * For more details take a look at the Java Quickstart chapter in the Gradle
+ * user guide available at https://docs.gradle.org/4.4.1/userguide/tutorial_java_projects.html
+ */
+
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+
+// Apply the application plugin to add support for building an application
+apply plugin: 'application'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+dependencies {
+    // This dependency is found on compile classpath of this component and consumers.
+    compile 'com.google.guava:guava:23.0'
+
+    // Use JUnit test framework
+    testCompile 'junit:junit:4.12'
+}
+
+// Define the main class for the application
+mainClassName = 'App'
+
+
+// we can add user defined tasks 
+task display{
+doLast{
+println '6A devops class'
+}
+}
+
+
+/******to run the gradle project
+gradle build
+gradle run
+Hello World 
+
+//if we have to run user defined task display
+gradle display 
+6A devops class
+
+6.
+//To migrate from maven to gradle 
+
+1. Create a maven based application
+mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenToGradle -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
+
+2. cd MyMavenToGradle
+
+3. gedit pom.xml
+
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<groupId>com.example1</groupId>
+<artifactId>MyMavenToGradle</artifactId>
+<packaging>jar</packaging>
+<version>1.0-SNAPSHOT</version>
+<name>MyMavenToGradle</name>
+<url>http://maven.apache.org</url>
+<!--  Properties: Customize Java version or plugin versions  -->
+<properties>
+<maven.compiler.source>11</maven.compiler.source>
+<maven.compiler.target>11</maven.compiler.target>
+</properties>
+<dependencies>
+<dependency>
+<groupId>junit</groupId>
+<artifactId>junit</artifactId>
+<version>3.8.1</version>
+<scope>test</scope>
+</dependency>
+</dependencies>
+<!--  Build: Configuring plugins and build settings  -->
+<build>
+<plugins>
+<!--  Example: Maven Compiler Plugin to compile Java code  -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.8.1</version>
+<configuration>
+<source>1.6</source>
+<target>1.6</target>
+</configuration>
+</plugin>
+<!--  Example: Maven Surefire Plugin to run tests  -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>2.22.2</version>
+</plugin>
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-jar-plugin</artifactId>
+<version>3.1.0</version>
+<configuration>
+<archive>
+<manifestEntries>
+<Main-Class>com.example1.App</Main-Class>
+</manifestEntries>
+</archive>
+</configuration>
+</plugin>
+</plugins>
+</build>
+</project>
+
+4. mvn clean install  // generates a jar file
+
+5. gradle init --type pom.xml   // creates build.gradle same as pom.xml with all the dependencies 
+
+6. tree
+├── build.gradle
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+├── gradlew.bat
+├── pom.xml
+├── settings.gradle
+├── src
+│   ├── main
+│   │   └── java
+│   │       └── com
+│   │           └── example1
+│   │               └── App.java
+
+
+7. gedit build.gradle
+//explicitly need to add manifest artifactId to inform the gradle from where to start the execution because in pom.xml we specify the starting point within the plugin
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'com.example1'
+version = '1.0-SNAPSHOT'
+
+description = """MyMavenToGradle"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+        
+     maven { url "https://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    testCompile group: 'junit', name: 'junit', version:'3.8.1'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.example1.App'
+        )
+    }
+}
+
+8. gradle build
+
+9. //run the jar file generated by generated available at build/libs/*.jar
+
+java -jar build/libs/MyMavenToGradle-1.0-SNAPSHOT.jar
+Hello World
+
+
+
+
+
+
+
