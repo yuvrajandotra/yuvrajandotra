@@ -1,3 +1,113 @@
+MICROSOFT AZURE ACCOUNT CREATION and Azure Pipeline creation for maven based application
+
+1) Goto browser and type portal.azure.com
+2) azure.com -> Get started with azure -> try azure for free -> Sign in with official mail id/microsoft account -> agree twice 
+    NOTE: Install microsoft authenticator app before inside your phone and login in
+3) Search for Azure devops organization and click on my azure devops organization.
+	Now it shows dev.azure.com
+4) Create new organization -> click continue -> give the name sample -> continue -> give the project name sampleAzure -> select private -> click create project -> click on project sampleAzure
+5) Now we will create a pipeline -> (on left side) click on pipeline -> create pipeline -> it will ask for where is that pipeline code
+6) Click on github -> displays all the repositories (first time it will ask for authorization) -> select anyone -> automatically write the azure pipeline
+   NOTE: For checking - click on Run
+   It requires java maven to run, so we need to create agent
+  We need to create a agent to run azure pipeline. 
+7) Goto project settings(scroll down)-> (on the lesft side) click agent pools -> select defaul->
+click agents -> we can see that no agents are avalilable.
+		Run - Permission denied.
+8) Click on Download the agent -> extract + configure it -> open the downloaded file.
+
+9) Goto terminal -> mkdir myselfHostedAgent
+		    cd myselfHostedAgent
+10) ls ( config.sh, run.sh etc)
+11) /config.sh
+12) Enter the server url : copy & paste( Goto azure copy the url of organization which we create including project name)
+13) Enter Authentication type ( press enter for PAT)
+  
+  we need to create PAT-(Personal Access Token) for azure as well ( Do not copy PAT of github)
+14) Goto project-page -> on right hand side we can see users settings -> click Personal Access tokens -> click new token ->name myPAT for devops -> Expiration-select No expiration/30 days -> click on Full access -> create -> generate PAT ( do copy PAT and save it in some file)
+15) Paste it in the terminal when it is currently running - enter PAT....
+
+   Now it is , to register Agent.
+16) Register Agent: 
+	Press enter, if we want the default agent pool
+	Enter agent name (enter for hemavthi_virtualbox)
+	Enter work folder (press enter for_ work)
+	Now press enter- still the agent will be offline
+	--stop here
+	Go back to Azure - sample2-> project setting -> Agent pools- Agent hemavatjhi_virtualbox (offline)
+	
+17) Go back to terminal - ls
+18) /run.sh -> now it will be online
+19) Now go back to sample2-pipeline -> ..myMavenApp
+	click on pipeline -> Branch:master
+	click - run
+	Job -shows the status of running
+    click on view log, buil with maven
+    This is my first maven java project 
+    -> called as Azure pipeline
+20) customize the yaml file
+    Goto repository - ....yml
+    CODE:
+     	# Starter pipeline
+	# Start with a minimal pipeline that you can customize to build and deploy your code.
+	# Add steps that build, run tests, deploy, and more:
+	# https://aka.ms/yaml
+
+	trigger:
+	- master
+
+	pool:
+	  name: Default
+
+	steps:
+	- script: echo Myfirst Azure Pipeline for maven project
+	  displayName: 'Run a one-line script'
+	- script: mvn clean install
+	  displayName: 'Build with maven'
+	- script: java -jar target/SimpleMavenApp-1.0-SNAPSHOT.jar
+	  displayName: 'Running jar'
+	  
+21) mydevops organization
+	-> create new project - sample3
+			      -private
+			      -Git -> create
+	pipeline - create pipeline -> select repository
+	select ..  -> authorization 
+	-> displays all the repositories
+	choose the correct one - approve and install
+	select account(microsoft)
+	it craetes a project
+	-> maven based java project (select maven)
+	it opens a yml file
+	customize as per the requirement
+	click and save and run
+	shows the commit changes - it is changed
+	commit directly to the master branch and create pipeline
+	Repository - .yml file is added to github
+	sample3 -> clcik pipeline -> runs
+	  it will ask for the permission - click now - permit -> starts running
+	 click on now raw fies -> it shows in detail
+
+Agent will be keep running- so stop it ^C
+go back and checkout in agent pools -> it will be offline
+configuration is only one time, if we have to run - just run the command - /run.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 To create a Jenkins pipeline for maven based webapp using ansible to automatically copy the war file from Maven target folder to tomcat webapps folder and run the web application
 
 1. Make sure apache tomcat is installed in the root directory
