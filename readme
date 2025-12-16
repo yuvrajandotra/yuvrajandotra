@@ -1,934 +1,314 @@
-MICROSOFT AZURE ACCOUNT CREATION and Azure Pipeline creation for maven based application
-
-1) Goto browser and type portal.azure.com
-2) azure.com -> Get started with azure -> try azure for free -> Sign in with official mail id/microsoft account -> agree twice 
-    NOTE: Install microsoft authenticator app before inside your phone and login in
-3) Search for Azure devops organization and click on my azure devops organization.
-	Now it shows dev.azure.com
-4) Create new organization -> click continue -> give the name sample -> continue -> give the project name sampleAzure -> select private -> click create project -> click on project sampleAzure
-5) Now we will create a pipeline -> (on left side) click on pipeline -> create pipeline -> it will ask for where is that pipeline code
-6) Click on github -> displays all the repositories (first time it will ask for authorization) -> select anyone -> automatically write the azure pipeline
-   NOTE: For checking - click on Run
-   It requires java maven to run, so we need to create agent
-  We need to create a agent to run azure pipeline. 
-7) Goto project settings(scroll down)-> (on the lesft side) click agent pools -> select defaul->
-click agents -> we can see that no agents are avalilable.
-		Run - Permission denied.
-8) Click on Download the agent -> extract + configure it -> open the downloaded file.
-
-9) Goto terminal -> mkdir myselfHostedAgent
-		    cd myselfHostedAgent
-10) ls ( config.sh, run.sh etc)
-11) /config.sh
-12) Enter the server url : copy & paste( Goto azure copy the url of organization which we create including project name)
-13) Enter Authentication type ( press enter for PAT)
-  
-  we need to create PAT-(Personal Access Token) for azure as well ( Do not copy PAT of github)
-14) Goto project-page -> on right hand side we can see users settings -> click Personal Access tokens -> click new token ->name myPAT for devops -> Expiration-select No expiration/30 days -> click on Full access -> create -> generate PAT ( do copy PAT and save it in some file)
-15) Paste it in the terminal when it is currently running - enter PAT....
-
-   Now it is , to register Agent.
-16) Register Agent: 
-	Press enter, if we want the default agent pool
-	Enter agent name (enter for hemavthi_virtualbox)
-	Enter work folder (press enter for_ work)
-	Now press enter- still the agent will be offline
-	--stop here
-	Go back to Azure - sample2-> project setting -> Agent pools- Agent hemavatjhi_virtualbox (offline)
-	
-17) Go back to terminal - ls
-18) /run.sh -> now it will be online
-19) Now go back to sample2-pipeline -> ..myMavenApp
-	click on pipeline -> Branch:master
-	click - run
-	Job -shows the status of running
-    click on view log, buil with maven
-    This is my first maven java project 
-    -> called as Azure pipeline
-20) customize the yaml file
-    Goto repository - ....yml
-    CODE:
-     	# Starter pipeline
-	# Start with a minimal pipeline that you can customize to build and deploy your code.
-	# Add steps that build, run tests, deploy, and more:
-	# https://aka.ms/yaml
-
-	trigger:
-	- master
-
-	pool:
-	  name: Default
-
-	steps:
-	- script: echo Myfirst Azure Pipeline for maven project
-	  displayName: 'Run a one-line script'
-	- script: mvn clean install
-	  displayName: 'Build with maven'
-	- script: java -jar target/SimpleMavenApp-1.0-SNAPSHOT.jar
-	  displayName: 'Running jar'
-	  
-21) mydevops organization
-	-> create new project - sample3
-			      -private
-			      -Git -> create
-	pipeline - create pipeline -> select repository
-	select ..  -> authorization 
-	-> displays all the repositories
-	choose the correct one - approve and install
-	select account(microsoft)
-	it craetes a project
-	-> maven based java project (select maven)
-	it opens a yml file
-	customize as per the requirement
-	click and save and run
-	shows the commit changes - it is changed
-	commit directly to the master branch and create pipeline
-	Repository - .yml file is added to github
-	sample3 -> clcik pipeline -> runs
-	  it will ask for the permission - click now - permit -> starts running
-	 click on now raw fies -> it shows in detail
-
-Agent will be keep running- so stop it ^C
-go back and checkout in agent pools -> it will be offline
-configuration is only one time, if we have to run - just run the command - /run.sh
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-To create a Jenkins pipeline for maven based webapp using ansible to automatically copy the war file from Maven target folder to tomcat webapps folder and run the web application
-
-1. Make sure apache tomcat is installed in the root directory
-
-2. Add the tomcat.service file if not available
-2.1 Set Permissions for the username hemavathi
-// id tomcat
-
-sudo chmod +x /opt/tomcat/bin/*.sh
-//sudo chown -R tomcat:hemavathi /opt/tomcat
-sudo chmod +x /opt/tomcat/bin/*.sh
-//sudo chmod +x /opt/tomcat/bin/*.sh
-
-2.2. write the tomcat.service file
-sudo -i   // go to root directory
-cd /
-cd etc/systemd/system
-ls
-//please check for the tomcat.service file,if available ignore the below steps,if not do add the tomcat.service file 
-
-2.3. gedit tomcat.service
-
-After=network.target
-
-[Service]
-Type=forking
-
-User=tomcat
-Group=tomcat
-
-Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64"
-Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
-Environment="CATALINA_HOME=/opt/tomcat"
-Environment="CATALINA_BASE=/opt/tomcat"
-
-ExecStart=/opt/tomcat/bin/startup.sh
-ExecStop=/opt/tomcat/bin/shutdown.sh
-
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-
-
-2.4 Now we can start and stop the tomcat server directly from user instead of from root directory
-hemavathi@hemavathi-VirtualBox:~$ sudo systemctl stop tomcat
-hemavathi@hemavathi-VirtualBox:~$ sudo systemctl start tomcat
-
-
-3. while executing, Sometimes it says permission denied for creating pipeline for webapplication on jenkins so kindly follow the commands 
-//Downloads the latest official Jenkins GPG key and Saves the key in /usr/share/keyrings/ so that apt can use it for verification.
-
-hemavathi@hemavathi-VirtualBox:~$ curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-
-// Associate the Repository with the New Key
-After adding the key, we must explicitly tell the system to use it for verifying Jenkins packages: 
-This ensures that only trusted Jenkins packages will be installed.
-
-hemavathi@hemavathi-VirtualBox:~$ echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-
-hemavathi@hemavathi-VirtualBox:~$ sudo apt update
-
-after this restart the jenkins
-localhost:8080/safeRestart
-
-
-4. Create a maven based web application
-
-4.1 mvn archetype:generate -DgroupId=com.example -DartifactId=MavenAnsibleWebApp -DarchetypeArtifactId=maven-archetype-webapp -DinterativeMode=false
-
-4.2 cd MavenAnsibleWebApp
-gedit pom.xml  // add servet dependency from maven repository and change the plugin to war type 
-
-This XML file does not appear to have any style information associated with it. The document tree is shown below.
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<groupId>com.example</groupId>
-<artifactId>MavenAnsibleWebApp</artifactId>
-<packaging>war</packaging>
-<version>1.0-SNAPSHOT</version>
-<name>MavenAnsibleWebApp</name>
-<url>http://maven.apache.org</url>
-<dependencies>
-<dependency>
-<groupId>junit</groupId>
-<artifactId>junit</artifactId>
-<version>3.8.1</version>
-<scope>test</scope>
-</dependency>
-<!--  Servlet API for Java EE  -->
-<dependency>
-<groupId>javax.servlet</groupId>
-<artifactId>javax.servlet-api</artifactId>
-<version>4.0.1</version>
-<scope>provided</scope>
-</dependency>
-</dependencies>
-<build>
-<plugins>
-<plugin>
-<groupId>org.apache.maven.plugins</groupId>
-<artifactId>maven-war-plugin</artifactId>
-<version>3.4.0</version>
-<!--  Update to latest stable version  -->
-</plugin>
-</plugins>
-<finalName>MavenAnsibleWebApp</finalName>
-<!--  create a web page with the name MavenAnsibleWebApp, if we want some other name we can chage it  -->
-</build>
-</project>
-
-
-4.3 mvn clean install  //generates a war file in target folder MavenAnsibleWebApp.war
-4.4 create a new git repositoy MavenAnsibleWebApp
-4.5 in terminal type gedit Jenkinsfile
-
-pipeline {
-    agent any  // Use any available agent
-    
-    environment {
-        LANG = 'en_US.UTF-8'
-        LC_ALL = 'en_US.UTF-8'
-    }   // this has to be added only if you get an error saying UTF required is 8 but showing in ISO00009
-
-    tools {
-        maven 'Maven'  // Ensure this matches the name configured in Jenkins
-    }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'master', url: 'https://github.com/Hemavathipcse/MavenAnsibleWebApp.git'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'  // Run Maven build
-            }
-        }
-
-     stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.war', fingerprint:true
-            }
-        }
-        stage('Deploy') {
-            steps {
-               sh 'mvn clean package'  
-               sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
-            }
-        }
-
-                  
-    }
-
-   }
-   
-
-4.6 Create a Ansible host file and playbook/deploy file 
-we can either create a ansible directory within the maven project folder and then add yaml and ini files or directly within the maven project folder ( accordingly we have to make the changes in the jenkins file ie sh ' ansible-playbook ansible/playbook.yml -i ansible/hosts.ini' or sh ansible-playbook playbook.yml -i hosts.ini')
-
-mkdir ansible
-cd ansible
-hemavathi@hemavathi-VirtualBox:~/MavenAnsibleWebApp/ansible$ gedit hosts.ini
-
-[web]
-localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
-
-save and exit
-
-hemavathi@hemavathi-VirtualBox:~/MavenAnsibleWebApp/ansible$ gedit playbook.yml
-
-
----
-- name: Deploy to Tomcat
-  hosts: web
-  become: yes
-  tasks:
-    - name: Copy WAR file to Tomcat
-      copy:
-        src: "/var/snap/jenkins/4829/workspace/MavenAnsible-CICD/target/MavenAnsibleWebApp.war"
-        dest: "/opt/tomcat/webapps/MavenAnsibleWebApp.war"
-        remote_src: no
-
-    - name: Restart Tomcat
-      systemd:
-        name: tomcat
-        state: restarted
-        
-save and exit
-//Note: in the above script we need to check two things 
-    a) the number 4829, please write this number with to respect to your sytem generated folder number  
-    b)MavenAsnible-CICD is the pipeline name which is created in the jenkins ( create new item and give the name as your wish --the respective name has to be specified here)  
-    
-    
-5. Push it on to git hub
-
-git init
-git add.
-git commit -m "Initial commit"
-git remote add origin https://github.com/Hemavathipcse/MavenAnsibleWebApp.git
-git remote set-url origin https://ghp_VgCxGfbkbF4WgATJo3bg2CjtnQ@github.com/Hemavathipcse/MavenAnsibleWebApp.git
-git push -u origin master
-
-
-//please checkout in the git hub repository
-
-6. create a jenkins pipeline
-
-6.1 goto browser and type localhost:8080   // logs into jenkins
-6.1 click on new item and give the name MavenAnsible-CICD // it should match with the name given in the playbook.yml
-    select pipeline from the item item and click ok
-    
-6.2  we get one more window which will ask us to configue the pipeline 
-   6.2.1 Description //give the description as you require
-   6.2.2 scroll down, we can pipeline section in this 
-          Definition: pipeline script from SCM(source Code Manager)  //select this option
-          SCM: Git  //select
-          Repository URL : https://github.com/Hemavathipcse/MavenAnsibleWebApp.git //copy and paste the git hub repository url
-          Credentials: MAvenGradleCICD // displays the name which you have given while creating the token 
-          Click on lighweight checkout // checkbox
-          Apply and ok
-          
-6.3 Displays the pipeline which we created just now 
-     select and click on build now, 
-     //displays build is scheduled and shows the pipeline stages what we have written in jenkinsfile 
-     //either successful or build failed. If failed we can click on logs and see the errors and fix the bugs accordingly and rebuild
-     //if successful, go to logs and click on the last line it shows the respective output
-     
-     
- 
-
-     
-   curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-   
-   
-   
-   echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-   
-   
-
-
-
-
-
-
-1.
-/***********creating a maven based application using terminal
-
-1. open terminal and type
-mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenApp -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
-
-2. get into the directory
- cd MyMavenApp
- /MyMAvenApp/gedit pom.xml
-// add dependencies from maven central repository
-goto chrome --> maven central repository --> search for a particular dependency --> type junit--> it shows the dependency --> scroll up --> click on the recent version and copy the dependency available and paste it in pom.xml under dependencies tag 
-
-// add  plugins to generate jar file and to compile and intimate where to start the application from 
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.example</groupId>
-  <artifactId>MyMavenApp</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  
-  
-  <name>MyMavenApp</name>
-  <url>http://maven.apache.org</url>
-  
-  <!-- Properties: Customize Java version or plugin versions -->
-<properties>
-<maven.compiler.source>11</maven.compiler.source>
-<maven.compiler.target>11</maven.compiler.target>
-</properties>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  
-  <!-- Build: Configuring plugins and build settings -->
-<build>
-<plugins>
-<!-- Example: Maven Compiler Plugin to compile Java code -->
-<plugin>
-<groupId>org.apache.maven.plugins</groupId>
-<artifactId>maven-compiler-plugin</artifactId>
-<version>3.8.1</version>
-<configuration>
-<source>1.7</source>
-<target>1.7</target>
-</configuration>
-</plugin>
-
-<!-- Example: Maven Surefire Plugin to run tests -->
-<plugin>
-<groupId>org.apache.maven.plugins</groupId>
-<artifactId>maven-surefire-plugin</artifactId>
-<version>2.22.2</version>
-</plugin>
-
-
-<plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>3.1.0</version>
-            <configuration>
-                <archive>
-                    <manifestEntries>
-                        <Main-Class>com.example.App</Main-Class>
-                    </manifestEntries>
-                </archive>
-            </configuration>
-        </plugin>
-        
-</plugins>
-</build>
-</project>
-
-3. mvn compile  // compiles the application
-4. mvn test
-5. mvn package   // generates the jar file
-6. java -jar target/MyMaven.....    // run the App.java file and displays the output
-
-OR
-
-mvn clean install
-java -jar target/MyMaven.....jar 
-
-st;
-public class App 
+const int ledPins[] = {2, 3, 4, 5, 6};
+const int numLEDs = 5;
+void setup() {
+  for (int i = 0; i < numLEDs; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+}
+void loop() {
+  // Left to right
+  for (int i = 0; i < numLEDs; i++) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(1000);
+    digitalWrite(ledPins[i], LOW);
+  }
+  // Right to left
+  for (int i = numLEDs - 1; i >= 0; i--) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(1000);
+    digitalWrite(ledPins[i], LOW);
+  }
+}
+[1:43 PM, 8/19/2025] +91 97439 25282: int ledpin1=2;
+int ledpin2=3;
+int ledpin3=4;
+int ledpin4=5;
+int ledpin5=6;
+int wait=1000;
+void setup()
 {
-    public static void main( String[] args )
+  pinMode(ledpin1,OUTPUT);
+  pinMode(ledpin2,OUTPUT);
+  pinMode(ledpin3,OUTPUT);
+  pinMode(ledpin4,OUTPUT);
+  pinMode(ledpin5,OUTPUT);
+ Serial.begin(9600);
+}
+
+void loop()
+{
+  digitalWrite(ledpin1,HIGH);
+  delay(wait);
+  digitalWrite(ledpin1,LOW);
+  digitalWrite(ledpin2,HIGH);
+  delay(wait);
+  digitalWrite(ledpin2,LOW);
+  digitalWrite(ledpin3,HIGH);
+  delay(wait);
+   digitalWrite(ledpin3,LOW);
+   digitalWrite(ledpin4,HIGH);
+   delay(wait);
+   digitalWrite(ledpin4,LOW);
+   digitalWrite(ledpin5,HIGH);
+  delay(wait);
+  digitalWrite(ledpin5,LOW);
+  digitalWrite(ledpin4,HIGH);
+  delay(wait);
+  digitalWrite(ledpin4,LOW);
+  digitalWrite(ledpin3,HIGH);
+  delay(wait);
+  digitalWrite(ledpin3,LOW);
+  digitalWrite(ledpin2,HIGH);
+  delay(wait);
+  digitalWrite(ledpin2,LOW);
+  digitalWrite(ledpin1,HIGH);
+  delay(wait);
+  digitalWrite(ledpin1,LOW);
+}
+
+
+const int trigPin = 9;
+const int echoPin = 10;
+const int soundSensor = A0;
+const int greenLed=7;
+const int redLed = 8;
+const int buzzerPin = 6;
+// Threshold values
+const int safeDistance=75;
+const int soundThreshold = 500;  // Adjust based on your environment
+const int distanceThreshold = 50; // Distance in cm (adjust as needed)
+// Variables
+long duration;
+int distance;
+int soundValue;
+bool intrusionDetected = false;
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+  // Set pin modes
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(soundSensor, INPUT);
+  pinMode(greenLed, OUTPUT);
+  pinMode(redLed, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  // Initial state
+  digitalWrite(greenLed, HIGH);
+  digitalWrite(redLed, LOW);
+  noTone(buzzerPin);
+  Serial.begin(9600);
+    Serial.println("Intrusion Detection System Initialized");
+}
+void loop() {
+  // Measure distance with ultrasonic sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2; // Calculate distance in cm
+   // Read sound sensor value
+  soundValue = analogRead(soundSensor);
+  // Check for intrusion
+  if (distance < safeDistance || soundValue > soundThreshold) {
+    if(!intrusionDetected){
+    intrusionDetected = true;
+    triggerAlarm();
+    Serial.println("INTRUSION DETECTED!");
+    Serial.print("Distance: ");
+    Serial.print(distance);
+ Serial.print(" cm | Sound Level: ");
+    Serial.println(soundValue);
+    }} else {
+    if (intrusionDetected) {
+      // Intrusion no longer detected
+      intrusionDetected = false;
+      stopAlarm();
+      Serial.println("Area secure");
+    }
+  }
+  
+  delay(100); // Small delay between readings
+}
+
+
+
+int motorPin = 9;   // PWM-capable pin connected to the transistor base via resistor
+void setup() {
+  pinMode(motorPin, OUTPUT);  // Set the pin as output
+}
+
+void loop() {
+  // Ramp up speed from 0 to full (255)
+  for (int speed = 0; speed <= 255; speed += 5) {
+    analogWrite(motorPin, speed);  // Set PWM value for speed control
+    delay(30);  // Short delay for smooth ramp
+  }
+  
+  // Ramp down speed from full (255) to 0
+  for (int speed = 255; speed >= 0; speed -= 5) {
+    analogWrite(motorPin, speed);  // Set PWM value for speed control
+    delay(30);  // Short delay for smooth ramp
+  }
+}
+
+
+int sensorPin = A0; 
+int sensorValue = 0;
+int led = 9;
+void setup() {
+pinMode(led, OUTPUT);
+Serial.begin(9600);
+} 
+void loop(){
+sensorValue = analogRead(sensorPin);
+Serial.println(sensorValue);  
+if(sensorValue < 100){
+Serial.println("LED light on");
+digitalWrite(led,HIGH);
+delay(1000);
+ }
+digitalWrite(led,LOW);
+delay(sensorValue);
+}
+
+
+
+#include "DHT.h"
+
+#define DHTPIN 2       // Data pin connected to D2
+#define DHTTYPE DHT22  // DHT22 (AM2302)
+
+#define LED_DRY 8
+#define LED_WET 9
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+  pinMode(LED_DRY, OUTPUT);
+  pinMode(LED_WET, OUTPUT);
+}
+
+void loop() {
+  float humidity = dht.readHumidity();
+
+  if (isnan(humidity)) {
+    Serial.println("Failed to read from DHT22 sensor!");
+    return;
+  }
+
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+
+  if (humidity < 60.0) {  
+    Serial.println("Waste classified as: DRY");
+    digitalWrite(LED_DRY, HIGH);
+    digitalWrite(LED_WET, LOW);
+  } else {
+    Serial.println("Waste classified as: WET");
+    digitalWrite(LED_WET, HIGH);
+    digitalWrite(LED_DRY, LOW);
+  }
+
+  delay(2000);
+}
+
+
+
+int sensorPin = A0;      // Analog input pin for pH sensor (simulated using potentiometer)
+float sensorValue = 0;   
+float pHValue = 0;
+
+void setup()
+{
+  Serial.begin(9600);
+  Serial.println("pH Value Detection of Substances");
+  Serial.println("--------------------------------");
+}
+
+void loop()
+{
+  // Read simulated sensor value
+  sensorValue = analogRead(sensorPin);
+  
+  // Convert the analog value (0–1023) into pH range (0–14)
+  pHValue = (sensorValue * 14.0) / 1023.0;
+  
+  Serial.print("Measured pH Value: ");
+  Serial.println(pHValue);
+
+  // Identify the substance based on typical pH ranges
+  if (pHValue >= 6.4 && pHValue <= 6.8)
+ {
+    Serial.println("Substance: Milk");
+  }
+  else if (pHValue >= 6.9 && pHValue<= 7.1)
+ {
+    Serial.println("Substance: Water");
+ } 
+  else if (pHValue >= 9.0 && pHValue<=10.0)
+ {
+    Serial.println("Substance: Lime Water");
+ } 
+  
+  else
+ {
+    Serial.println("Unknown substance or out of range");
+  }
+
+ // Determine the nature of the substance
+  if (pHValue < 7.0)
+ {
+    Serial.println("Nature: Acidic");
+  } 
+  else if (pHValue == 7.0)
+ {
+    Serial.println("Nature: Neutral");
+  } 
+  else
+ {
+    Serial.println("Nature: Basic (Alkaline)");
+  }
+  Serial.println("--------------------------------");
+  delay(3000);  // Wait 3 seconds before next reading
+}
+
+
+
+12 
+
+#include<Keypad.h>
+
+const byte Rows=4;
+const byte Cols=4;
+
+char keys[Rows][Cols]={
+  {'1','2','3','+'},
+  {'4','5','6','-'},  
+    {'7','8','9','*'},
+    {'@','0','#','%'}
+};
+
+byte rowpins[Rows]={9,8,7,6};
+byte colpins[Cols]={5,4,3,2};
+
+Keypad keypad=Keypad(makeKeymap(keys),rowpins,colpins,Rows,Cols);
+
+void setup(){
+  Serial.begin(9600);
+}
+
+void loop(){
+  char key=keypad.getKey();
+  if(key){
     {
-        ImmutableList<String> fruits = ImmutableList.of("Apple", "Banana", "Cherry");
-        System.out.println(fruits);
-        
-        // Define source and destination files
-        File sourceFile = new File("source.txt");
-        File destFile = new File("destination.txt");
-
-        try {
-            // Copy file using Apache Commons IO
-            FileUtils.copyFile(sourceFile, destFile);
-            System.out.println("File copied successfully!");
-        } catch (IOException e) {
-            System.err.println("Error occurred while copying file: " + e.getMessage());
-        }
-    
+      Serial.print("key pressed: ");
+      Serial.println(key);
     }
+  }
 }
-
-
-3. mvn clean install
-4. java -jar target/MyMaven.....jar   // if it gives error saying class not found, execute the below command
-5. mvn exec:java -Dexec.mainClass="com.example.App"
-[INFO] Scanning for projects...
-[INFO] 
-[INFO] --------------------< com.example:MyMavenGuavaApp >---------------------
-[INFO] Building MyMavenGuavaApp 1.0-SNAPSHOT
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-[INFO] --- exec-maven-plugin:3.5.0:java (default-cli) @ MyMavenGuavaApp ---
-[Apple, Banana, Cherry]
-File copied successfully!
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  2.198 s
-[INFO] Finished at: 2025-03-28T16:12:33+05:30
-[INFO] ------------------------------------------------------------------------
-
-// we can see the list created as [Apple, Banana, Cherry] at line number 133 and also file copied successfully
-
-6. hemavathi@hemavathi-VirtualBox:~/MyMavenGuavaApp$ cat destination.txt
-This is a file created using common io dependency
-
-
-4.
-//Create maven based web application 
-
-1. We need to install Apache tomcat to run this application	
-2.	
-3.	Sudo –i // to go to root directory
-4.	Sudo apt update && sudo upgrade –y
-5.	cd /tmp
-6.	wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.100/bin/apache-tomcat-9.0.100.tar.gz
-7.	cd ..
-8.	cd opt
-9.	mkdir tomcat
-10.	cd ..
-11.	cd tmp
-12.	tar file has to be extracted into the tomcat folder so run the below command
-13.	sudo tar -xvzf apache-tomcat-9.0.100.tar.gz -C /opt/tomcat --strip-components=1
-14.	cd ..
-15.	cd opt/tomcat
-16.	ls // we can see all files are extracted 
-17.	cd conf
-18.	ls // we can see server.xml use this file to change the port number from default 8080 to any number say 9090 because Jenkins is running on 8080
-19.	gedit server.xml // go to line number 70 and change the portnumber to 9090  <connector port=9090…..> save
-20.	we need to create tomcat users as well so add the users in tomcat-users.xml file
-21.	gedit tomcat-users.xml  
-22.	line 22 add  <user username="admin" password="Admin" roles="manager-gui"/> then save
-23.	cd ..
-24.	cd bin
-25.	ls // we can startup.sh and shutdown,sh to start the tomcat and stop the tomcat 
-26.	just try opening the page in browser say localhost:9090  it displays page cannot be displayed so we need to start the tomcat
-27.	sh startup.sh
-28.	now check in the browser, localhost:9090  tomcat web page is displayed
-29.	go to manage app on the right side of the web page it will ask for username and password. Enter the user name and password what we added in the step number 22
-30.	The server displays default files along with the user created files if any
-31.	 Go back to terminal and type cd ..
-32.	Ls // we can see webapp folder this is where we will be copying the war file generated by maven based web application
-
-
-2. once apache tomcat is installed, create a web application
-
-mvn archetype:generate -DgroupId=com.example -DartifactId=MymavenWebApp01 -DarchetypeArtifactId=maven-archetype-webapp -DinterativeMode=false
-
-
-3. Add the dependency Servlet app in pom.xml -search for 
-<!-- Servlet API for Java EE -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        
-4.It generates a WAR file instead of JAR file so add the plugin accordingly and we donot need plugin to start the java application plugin because it is an web appication so we write the artifactId of build plugin as <artifactId>maven-war-plugin</artifactId> 
-
-<build>
-  <plugins>
-  <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-war-plugin</artifactId>
-    <version>3.4.0</version> <!-- Update to latest stable version -->
-</plugin>
-</plugins>
-    <finalName>MymavenWebApp01</finalName>
-  </build>
-</project>  
-
-
-//Entire pom.xml is as 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.example</groupId>
-  <artifactId>MymavenWebApp01</artifactId>
-  <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>MymavenWebApp01 Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <!-- Servlet API for Java EE -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-  </dependencies>
-  <build>
-  <plugins>
-  <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-war-plugin</artifactId>
-    <version>3.4.0</version> <!-- Update to latest stable version -->
-</plugin>
-</plugins>
-    <finalName>MymavenWebApp01</finalName> <!-- create a web page with the name MymavenWebapp01, if we want some other name we can chage it -->
-  </build>
-</project>
-
-
-//when we use the tree we can see that webapp,index.jsp and web.xml is created instead of App.java
-── pom.xml
-├── src
-│   └── main
-│       ├── resources
-│       └── webapp
-│           ├── index.jsp
-│           └── WEB-INF
-│               └── web.xml
-
-// check the index.jsp file. It will be a simple web application by default
-<html>
-<body>
-<h2>Hello World!</h2>
-</body>
-</html>
-
-
-//mvn clean install
-
-//tree 
-we can see the war file inside the target folder
-── target
-    ├── classes
-    ├── maven-archiver
-    │   └── pom.properties
-    ├── MymavenWebApp01
-    │   ├── index.jsp
-    │   ├── META-INF
-    │   └── WEB-INF
-    │       ├── classes
-    │       └── web.xml
-    └── MymavenWebApp01.war
-
-
-// now copy this war file manually into apache tomcat webapps folder
-goto home->other locations->computer->opt/tomcat/webapps --> paste the war file here
-
-Or use the command as 
-cp target/MyMavenWebapp01.war /opt/tomcat/webapps 
-
-
-// goto browser and type
-localhost:9090  
-since jenkins is running on 8080, configure a different port number for tomcat while in starting itself because by default tomcat also runs on 8080 
-// it displays the MyMavenWebapp.war file just click on the file displays "Hello World"
-
-
-   5.
-
-/******************to build a gradle project
-
-create a directory MyGradleApp and be in that directory
-mkdir MyGradleApp
-cd MyGradleApp
-gradle init --type java-application
-/* show the build.gradle
-
-
-/*
- * This build file was generated by the Gradle 'init' task.
- *
- * This generated file contains a sample Java project to get you started.
- * For more details take a look at the Java Quickstart chapter in the Gradle
- * user guide available at https://docs.gradle.org/4.4.1/userguide/tutorial_java_projects.html
- */
-
-// Apply the java plugin to add support for Java
-apply plugin: 'java'
-
-// Apply the application plugin to add support for building an application
-apply plugin: 'application'
-
-// In this section you declare where to find the dependencies of your project
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-}
-
-dependencies {
-    // This dependency is found on compile classpath of this component and consumers.
-    compile 'com.google.guava:guava:23.0'
-
-    // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
-}
-
-// Define the main class for the application
-mainClassName = 'App'
-
-
-// we can add user defined tasks 
-task display{
-doLast{
-println '6A devops class'
-}
-}
-
-
-/******to run the gradle project
-gradle build
-gradle run
-Hello World 
-
-//if we have to run user defined task display
-gradle display 
-6A devops class
-
-
-PIPELINE
-//MAVEN
-
-
-
-
-
-pipeline {
-    agent any  // Use any available agent
-
-    tools {
-        maven 'Maven'  // Ensure this matches the name configured in Jenkins
-    }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'master', url: 'https://github.com/Hemavathipcse/MyMavenJenkinsPipeline.git'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'  // Run Maven build
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'  // Run unit tests
-            }
-        }
-
-        
-        
-       
-        stage('Run Application') {
-            steps {
-                // Start the JAR application
-                sh 'java -jar target/MyMavenJenkinsPipeline-1.0-SNAPSHOT.jar'
-            }
-        }
-
-        
-    }
-
-    post {
-        success {
-            echo 'Build and deployment successful!'
-        }
-        failure {
-            echo 'Build failed!'
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-//GRADLE
-
-
-
-
-
-pipeline {
-    agent any  // Use any available agent
-
-    tools {
-        gradle 'Gradle'  // Ensure this matches the name configured in Jenkins
-        jdk 'JDK'
-    }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'master', url: 'https://github.com/Hemavathipcse/GradleJenkinsPipeline.git'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'gradle build'  // Run Maven build
-            }
-        }
-
-       stage('Test') {
-           steps {
-               sh 'gradle test'  // Run unit tests
-           }
-        }
-
-              
-        stage('Run Application') {
-            steps {
-                // Start the JAR application
-                sh 'gradle run'
-            }
-        }
-
-        
-    }
-
-    post {
-        success {
-            echo 'Build and deployment successful!'
-        }
-        failure {
-            echo 'Build failed!'
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-//SELENIUM
-
-
-
-
-
-pipeline {
-	agent any
-	
-	tools {
-		maven 'MAVEN'
-		jdk 'JDK'
-	}
-	
-	stages {
-	
-		stage('Checkout') {
-			steps {
-				git branch: 'master', url: 'https://github.com/vsshubh/SeleniumApp.git'
-			}
-		}
-		
-		stage('Build') {
-			steps {
-				sh 'mvn compile package'
-			}
-		}
-		
-		stage('Test') {
-			steps {
-				sh 'mvn test'
-			}
-		}	
-		
-		stage('Archive Artifacts') {
-			steps {
-				archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-			}
-		}	
-	}
-	
-	post {
-		success {
-			echo 'Pipeline Successfull!'
-		}
-		failure {
-			echo 'Pipeline Failed!'
-		}
-	}
-}								
-
-
-
-
-
-
-
-
-
-
-
-//MAVEN WEBAPP
-
-
-
-
-pipeline {
-    agent any
-
-    tools {
-        maven 'MAVEN'
-        jdk 'JDK'
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/vsshubh/MavenWebPrac.git'
-            }
-        }
-
-        stage('Build WAR') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-    }
-
-
-
-
-
-
-
